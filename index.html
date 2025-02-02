@@ -5,52 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Professional portfolio showcasing my work and experience in web development" />
   <title>Berserk</title>
-  <!-- Import Roboto from Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* Colors and transitions */
       --primary-color: #6b46c1;
       --secondary-color: #1a202c;
       --text-color: #ffffff;
       --transition-speed: 0.3s;
     }
-    /* Dark mode is enabled by default */
+
     body {
       --text-color: #ffffff;
-    }
-    /* Ambient backgrounds toggle */
-    body.dark-mode #starfield { display: block; }
-    body.dark-mode #cloudfield { display: none; }
-    body:not(.dark-mode) #starfield { display: none; }
-    body:not(.dark-mode) #cloudfield { display: block; }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      cursor: none;
-    }
-    html {
-      scroll-behavior: smooth;
-    }
-    /* Allow vertical scroll; hide horizontal overflow */
-    body {
       background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
       color: var(--text-color);
       font-family: 'Roboto', sans-serif;
       line-height: 1.6;
       min-height: 100vh;
       overflow-x: hidden;
-      overflow-y: auto;
       position: relative;
       transition: background 0.5s ease;
     }
-    
-    /* ---------- Ambient Background Containers ---------- */
-    /* Night: Starfield container */
+
+    body.dark-mode #starfield { display: block; }
+    body.dark-mode #cloudfield { display: none; }
+    body:not(.dark-mode) #starfield { display: none; }
+    body:not(.dark-mode) #cloudfield { display: block; }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      cursor: none;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Ambient Background */
     #starfield {
       position: fixed;
       top: 0;
@@ -61,7 +55,6 @@
       overflow: hidden;
       z-index: -5;
     }
-    /* Day: Cloud container */
     #cloudfield {
       position: fixed;
       top: 0;
@@ -72,33 +65,35 @@
       overflow: hidden;
       z-index: -5;
     }
-    /* ---------- Stars & Clouds ---------- */
-    .star, .cloud {
-      position: absolute;
-    }
+
     .star {
+      position: absolute;
       width: 2px;
       height: 2px;
       background: white;
       border-radius: 50%;
       opacity: 0.8;
+      pointer-events: none;
     }
-    /* More realistic cloud shape */
+
     .cloud {
+      position: absolute;
       width: 120px;
       height: 60px;
       background: linear-gradient(135deg, #fff, #f0f0f0);
       opacity: 0.9;
       filter: blur(2px);
       clip-path: ellipse(50% 60% at 50% 50%);
+      pointer-events: none;
     }
-    /* ---------- Planets ---------- */
+
     .planet {
       position: absolute;
       border-radius: 50%;
       opacity: 0.6;
       filter: blur(1px);
     }
+
     .planet-1 {
       width: 80px;
       height: 80px;
@@ -115,6 +110,7 @@
       left: 70%;
       animation: orbit 15s linear infinite;
     }
+
     @keyframes orbit {
       0% {
         transform: rotate(0deg) translateX(150px) rotate(0deg);
@@ -123,8 +119,9 @@
         transform: rotate(360deg) translateX(150px) rotate(-360deg);
       }
     }
-    /* ---------- Custom Cursor ---------- */
-    body.dark-mode .cursor {
+
+    /* Cursor */
+    .cursor {
       position: fixed;
       top: 0;
       left: 0;
@@ -138,7 +135,8 @@
       filter: drop-shadow(0 0 15px yellow);
       transition: transform 0.1s ease-out;
     }
-    body.dark-mode .cursor::after {
+
+    .cursor::after {
       content: "";
       position: absolute;
       top: 50%;
@@ -150,33 +148,17 @@
       filter: blur(8px);
       z-index: -1;
     }
+
     body:not(.dark-mode) .cursor {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      transform: translate(-50%, -50%);
       background: radial-gradient(circle, #ddd 40%, #bbb 60%);
       filter: drop-shadow(0 0 15px purple);
-      transition: transform 0.1s ease-out;
     }
+
     body:not(.dark-mode) .cursor::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 150px;
-      height: 150px;
       background: radial-gradient(ellipse at center, rgba(128,0,128,0.2) 0%, transparent 80%);
-      transform: translate(-50%, -50%);
-      filter: blur(8px);
-      z-index: -1;
     }
-    /* ---------- Navigation & Layout ---------- */
+
+    /* Navigation */
     nav {
       position: fixed;
       top: 0;
@@ -186,6 +168,7 @@
       backdrop-filter: blur(10px);
       z-index: 1000;
     }
+
     .nav-container {
       max-width: 1200px;
       margin: 0 auto;
@@ -193,14 +176,17 @@
       justify-content: space-between;
       align-items: center;
     }
+
     .logo {
       font-size: 1.5rem;
       font-weight: bold;
     }
+
     .nav-links {
       display: flex;
       gap: 2rem;
     }
+
     .nav-btn {
       background: none;
       border: none;
@@ -210,6 +196,7 @@
       padding: 0.5rem 1rem;
       transition: var(--transition-speed);
     }
+
     .nav-btn::after {
       content: '';
       position: absolute;
@@ -220,9 +207,12 @@
       background: var(--text-color);
       transition: var(--transition-speed);
     }
+
     .nav-btn:hover::after {
       width: 100%;
     }
+
+    /* Scroll Section */
     .section {
       min-height: 100vh;
       padding: 8rem 2rem 4rem;
@@ -232,10 +222,12 @@
       position: relative;
       z-index: 1;
     }
+
     .section.visible {
       opacity: 1;
       transform: translateY(0);
     }
+
     .container {
       max-width: 1200px;
       margin: 0 auto;
@@ -243,17 +235,14 @@
   </style>
 </head>
 <body class="dark-mode">
-  <!-- Ambient Background Elements -->
   <div id="starfield"></div>
   <div id="cloudfield"></div>
-  
-  <!-- Planets -->
+
   <div class="planet planet-1"></div>
   <div class="planet planet-2"></div>
-  
-  <!-- Custom Cursor -->
+
   <div class="cursor"></div>
-  
+
   <nav>
     <div class="nav-container">
       <div class="logo">Portfolio</div>
@@ -264,12 +253,11 @@
       </div>
     </div>
   </nav>
-  
+
   <script>
-    // Global variables for cursor position
     let cursorX = 0, cursorY = 0;
-    
-    // Starfield background creation
+
+    // Create stars and animate their movement
     function createStars() {
       const starfield = document.getElementById('starfield');
       for (let i = 0; i < 200; i++) {
@@ -283,15 +271,20 @@
         starfield.appendChild(star);
       }
     }
-    
-    // Animate the custom cursor to follow the mouse
+
+    // Move stars around the cursor
     document.addEventListener('mousemove', (e) => {
       cursorX = e.clientX;
       cursorY = e.clientY;
+      const stars = document.querySelectorAll('.star');
+      stars.forEach(star => {
+        const offsetX = (Math.random() - 0.5) * 30;
+        const offsetY = (Math.random() - 0.5) * 30;
+        star.style.transform = `translate(${cursorX + offsetX}px, ${cursorY + offsetY}px)`;
+      });
       document.querySelector('.cursor').style.transform = `translate(${cursorX - 15}px, ${cursorY - 15}px)`;
     });
-    
-    // Trigger on scroll
+
     window.addEventListener('scroll', function () {
       document.querySelectorAll('.section').forEach(section => {
         if (window.scrollY + window.innerHeight > section.offsetTop + 100) {
@@ -299,7 +292,7 @@
         }
       });
     });
-    
+
     createStars();
   </script>
 </body>
