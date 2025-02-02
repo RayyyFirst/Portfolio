@@ -31,7 +31,7 @@
       font-family: 'Inter', sans-serif;
       line-height: 1.6;
       min-height: 100vh;
-      overflow-x: hidden;
+      overflow: hidden;
       position: relative;
     }
     /* ---------- Ambient Background ---------- */
@@ -43,9 +43,9 @@
       height: 100%;
       background: linear-gradient(180deg, #2d0035, #000022);
       overflow: hidden;
-      z-index: -3;
+      z-index: -5;
     }
-    /* Animated stars */
+    /* ---------- Stars & Planets ---------- */
     .star {
       position: absolute;
       width: 2px;
@@ -53,26 +53,35 @@
       background: white;
       border-radius: 50%;
       opacity: 0.8;
-      animation: twinkle 2s infinite alternate;
     }
-    @keyframes twinkle {
-      from { opacity: 0.3; }
-      to { opacity: 1; }
-    }
-    /* Drifting Planets */
     .planet {
       position: absolute;
       border-radius: 50%;
+      opacity: 0.6;
+      filter: blur(1px);
+    }
+    /* Example planet styles */
+    .planet-1 {
+      width: 80px;
+      height: 80px;
       background: radial-gradient(circle, #ffcc00, #cc9900);
-      opacity: 0.5;
-      filter: blur(2px);
-      animation: drift 25s linear infinite alternate;
+      top: 10%;
+      left: 20%;
+      animation: drift 30s linear infinite alternate;
+    }
+    .planet-2 {
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, #a366ff, #6611cc);
+      top: 65%;
+      left: 70%;
+      animation: drift 40s linear infinite alternate;
     }
     @keyframes drift {
       from { transform: translate(0, 0); }
-      to { transform: translate(20px, 20px); }
+      to { transform: translate(30px, 30px); }
     }
-    /* ---------- Custom Sun Ray Cursor ---------- */
+    /* ---------- Custom Sun (Cursor) ---------- */
     .cursor {
       position: fixed;
       top: 0;
@@ -83,22 +92,21 @@
       pointer-events: none;
       z-index: 9999;
       transform: translate(-50%, -50%);
-      background: radial-gradient(circle, rgba(255, 204, 0, 1) 0%, rgba(255, 153, 0, 0.7) 50%, transparent 80%);
+      background: radial-gradient(circle, rgba(255,255,0,1) 0%, rgba(255,255,0,0.5) 50%, transparent 70%);
+      filter: drop-shadow(0 0 15px yellow);
       transition: transform 0.1s ease-out;
-      /* Extra yellow glow */
-      filter: drop-shadow(0 0 10px yellow);
     }
-    .cursor::before {
+    /* Create a flashlight-beam effect with a pseudo-element */
+    .cursor::after {
       content: "";
       position: absolute;
       top: 50%;
       left: 50%;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(ellipse at center, rgba(255,255,0,0.2) 0%, transparent 80%);
       transform: translate(-50%, -50%);
-      background: radial-gradient(circle, rgba(255, 204, 0, 0.3) 0%, rgba(255, 153, 0, 0) 70%);
-      filter: blur(4px);
+      filter: blur(8px);
       z-index: -1;
     }
     /* ---------- Navigation & Layout ---------- */
@@ -154,6 +162,8 @@
       opacity: 0;
       transform: translateY(20px);
       transition: all 0.8s ease;
+      position: relative;
+      z-index: 1;
     }
     .section.visible {
       opacity: 1;
@@ -255,6 +265,7 @@
       border-radius: 50%;
       color: var(--text-color);
       transition: var(--transition-speed);
+      z-index: 1001;
     }
     @media (max-width: 768px) {
       .cursor {
@@ -279,11 +290,11 @@
 <body>
   <!-- Ambient Background Elements -->
   <div id="starfield"></div>
-  <!-- Planets (Example positions, adjust as needed) -->
-  <div class="planet" style="width: 80px; height: 80px; top: 10%; left: 20%;"></div>
-  <div class="planet" style="width: 120px; height: 120px; top: 60%; left: 70%; background: radial-gradient(circle, #a366ff, #6611cc);"></div>
-  
-  <!-- Custom Sun Ray Cursor -->
+  <!-- Planets -->
+  <div class="planet planet-1"></div>
+  <div class="planet planet-2"></div>
+
+  <!-- Custom Sun (Cursor) -->
   <div class="cursor"></div>
 
   <nav>
@@ -356,14 +367,68 @@
   <button class="theme-toggle interactive-element">🌓</button>
 
   <script>
-    // Custom cursor movement
+    // Global variables for cursor
+    let cursorX = 0, cursorY = 0;
     const cursor = document.querySelector('.cursor');
     document.addEventListener('mousemove', (e) => {
-      cursor.style.left = e.clientX + 'px';
-      cursor.style.top = e.clientY + 'px';
+      cursorX = e.clientX;
+      cursorY = e.clientY;
+      cursor.style.left = cursorX + 'px';
+      cursor.style.top = cursorY + 'px';
     });
     
-    // Scroll animations using Intersection Observer
+    // Starfield generation and animation with repulsion effect
+    const starfield = document.getElementById('starfield');
+    const numStars = 150;
+    const stars = [];
+    const repulsionDistance = 80; // distance at which stars are repelled
+    // Create stars with random positions and velocities
+    for (let i = 0; i < numStars; i++) {
+      const star = document.createElement('div');
+      star.classList.add('star');
+      const starObj = {
+        el: star,
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        vx: (Math.random() - 0.5) * 0.3, // small random velocity
+        vy: (Math.random() - 0.5) * 0.3
+      };
+      star.style.left = starObj.x + 'px';
+      star.style.top = starObj.y + 'px';
+      stars.push(starObj);
+      starfield.appendChild(star);
+    }
+    
+    // Animation loop for stars
+    function updateStars() {
+      for (let star of stars) {
+        // Calculate distance from star to cursor
+        const dx = star.x - cursorX;
+        const dy = star.y - cursorY;
+        const distance = Math.sqrt(dx*dx + dy*dy);
+        if (distance < repulsionDistance) {
+          // Calculate repulsion vector (normalize and multiply by a factor)
+          const factor = (repulsionDistance - distance) / repulsionDistance;
+          const repelForce = 1.5; // adjust force
+          star.vx += (dx / distance) * factor * repelForce;
+          star.vy += (dy / distance) * factor * repelForce;
+        }
+        // Update star position
+        star.x += star.vx;
+        star.y += star.vy;
+        // Wrap around edges
+        if (star.x < 0) star.x = window.innerWidth;
+        if (star.x > window.innerWidth) star.x = 0;
+        if (star.y < 0) star.y = window.innerHeight;
+        if (star.y > window.innerHeight) star.y = 0;
+        star.el.style.left = star.x + 'px';
+        star.el.style.top = star.y + 'px';
+      }
+      requestAnimationFrame(updateStars);
+    }
+    updateStars();
+    
+    // Intersection Observer for scroll animations
     const sections = document.querySelectorAll('.section');
     const observerOptions = { threshold: 0.1 };
     const observer = new IntersectionObserver((entries) => {
@@ -398,17 +463,10 @@
       });
     });
     
-    // Generate animated stars in the background
-    const starfield = document.getElementById('starfield');
-    const numStars = 150;
-    for (let i = 0; i < numStars; i++) {
-      const star = document.createElement('div');
-      star.classList.add('star');
-      star.style.left = Math.random() * 100 + '%';
-      star.style.top = Math.random() * 100 + '%';
-      star.style.animationDuration = (Math.random() * 3 + 2) + 's';
-      starfield.appendChild(star);
-    }
+    // Adjust starfield on window resize
+    window.addEventListener('resize', () => {
+      // Optionally update star positions if needed
+    });
   </script>
 </body>
 </html>
