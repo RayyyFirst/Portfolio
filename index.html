@@ -1,263 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Professional portfolio showcasing my work and experience in web development" />
-  <title>Berserk</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Space-Themed Page</title>
   <style>
-    :root {
-      --primary-color: #6b46c1;
-      --secondary-color: #1a202c;
-      --text-color: #ffffff;
-      --transition-speed: 0.3s;
-    }
-
-    body {
-      --text-color: #ffffff;
-      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-      color: var(--text-color);
-      font-family: 'Roboto', sans-serif;
-      line-height: 1.6;
-      min-height: 100vh;
-      overflow-x: hidden;
-      position: relative;
-      transition: background 0.5s ease;
-    }
-
-    body.dark-mode #starfield { display: block; }
-    body.dark-mode #cloudfield { display: none; }
-    body:not(.dark-mode) #starfield { display: none; }
-    body:not(.dark-mode) #cloudfield { display: block; }
-
-    * {
+    body, html {
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-      cursor: none;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle, #000000, #1b1b1b);
     }
 
-    html {
-      scroll-behavior: smooth;
-    }
-
-    /* Ambient Background */
     #starfield {
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(180deg, #2d0035, #000022);
-      overflow: hidden;
-      z-index: -5;
-    }
-    #cloudfield {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(180deg, #87ceeb, #fff);
-      overflow: hidden;
-      z-index: -5;
+      pointer-events: none;
     }
 
     .star {
       position: absolute;
-      width: 2px;
-      height: 2px;
-      background: white;
+      background-color: white;
       border-radius: 50%;
-      opacity: 0.8;
+      opacity: 0.5;
       pointer-events: none;
-    }
-
-    .cloud {
-      position: absolute;
-      width: 120px;
-      height: 60px;
-      background: linear-gradient(135deg, #fff, #f0f0f0);
-      opacity: 0.9;
-      filter: blur(2px);
-      clip-path: ellipse(50% 60% at 50% 50%);
-      pointer-events: none;
+      animation: star-animation 2s infinite;
     }
 
     .planet {
       position: absolute;
+      background-color: #00ff99;
       border-radius: 50%;
-      opacity: 0.6;
-      filter: blur(1px);
+      opacity: 0.7;
     }
 
-    .planet-1 {
-      width: 80px;
-      height: 80px;
-      background: radial-gradient(circle, #ffcc00, #cc9900);
-      top: 10%;
-      left: 20%;
-      animation: orbit 10s linear infinite;
-    }
-    .planet-2 {
-      width: 120px;
-      height: 120px;
-      background: radial-gradient(circle, #a366ff, #6611cc);
-      top: 65%;
-      left: 70%;
-      animation: orbit 15s linear infinite;
+    .planet1 {
+      width: 100px;
+      height: 100px;
+      top: 50%;
+      left: 50%;
+      animation: rotate-planet1 20s linear infinite;
     }
 
-    @keyframes orbit {
-      0% {
+    .planet2 {
+      width: 70px;
+      height: 70px;
+      top: 30%;
+      left: 30%;
+      animation: rotate-planet2 15s linear infinite;
+    }
+
+    @keyframes rotate-planet1 {
+      from {
+        transform: rotate(0deg) translateX(200px) rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg) translateX(200px) rotate(-360deg);
+      }
+    }
+
+    @keyframes rotate-planet2 {
+      from {
         transform: rotate(0deg) translateX(150px) rotate(0deg);
       }
-      100% {
+      to {
         transform: rotate(360deg) translateX(150px) rotate(-360deg);
       }
     }
 
-    /* Cursor */
     .cursor {
-      position: fixed;
-      top: 0;
-      left: 0;
+      position: absolute;
+      background-color: #ff00ff;
+      border-radius: 50%;
       width: 30px;
       height: 30px;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
       transform: translate(-50%, -50%);
-      background: radial-gradient(circle, rgba(255,255,0,1) 0%, rgba(255,255,0,0.5) 50%, transparent 70%);
-      filter: drop-shadow(0 0 15px yellow);
+      pointer-events: none;
+      z-index: 1000;
       transition: transform 0.1s ease-out;
     }
 
-    .cursor::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 150px;
-      height: 150px;
-      background: radial-gradient(ellipse at center, rgba(255,255,0,0.2) 0%, transparent 80%);
-      transform: translate(-50%, -50%);
-      filter: blur(8px);
-      z-index: -1;
-    }
-
-    body:not(.dark-mode) .cursor {
-      background: radial-gradient(circle, #ddd 40%, #bbb 60%);
-      filter: drop-shadow(0 0 15px purple);
-    }
-
-    body:not(.dark-mode) .cursor::after {
-      background: radial-gradient(ellipse at center, rgba(128,0,128,0.2) 0%, transparent 80%);
-    }
-
-    /* Navigation */
-    nav {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      padding: 1.5rem;
-      background: rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(10px);
-      z-index: 1000;
-    }
-
-    .nav-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-    }
-
-    .nav-btn {
-      background: none;
-      border: none;
-      color: var(--text-color);
-      font-size: 1rem;
-      position: relative;
-      padding: 0.5rem 1rem;
-      transition: var(--transition-speed);
-    }
-
-    .nav-btn::after {
-      content: '';
-      position: absolute;
-      width: 0;
-      height: 2px;
-      bottom: 0;
-      left: 0;
-      background: var(--text-color);
-      transition: var(--transition-speed);
-    }
-
-    .nav-btn:hover::after {
-      width: 100%;
-    }
-
-    /* Scroll Section */
     .section {
-      min-height: 100vh;
-      padding: 8rem 2rem 4rem;
+      height: 100vh;
       opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.8s ease;
-      position: relative;
-      z-index: 1;
+      transition: opacity 1s;
     }
 
     .section.visible {
       opacity: 1;
-      transform: translateY(0);
     }
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
+    @keyframes star-animation {
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 0.5;
+      }
     }
   </style>
 </head>
-<body class="dark-mode">
+<body>
   <div id="starfield"></div>
-  <div id="cloudfield"></div>
-
-  <div class="planet planet-1"></div>
-  <div class="planet planet-2"></div>
+  <div class="planet planet1"></div>
+  <div class="planet planet2"></div>
 
   <div class="cursor"></div>
 
-  <nav>
-    <div class="nav-container">
-      <div class="logo">Portfolio</div>
-      <div class="nav-links">
-        <button class="nav-btn">About</button>
-        <button class="nav-btn">Projects</button>
-        <button class="nav-btn">Contact</button>
-      </div>
-    </div>
-  </nav>
+  <div class="section" style="background-color: #333;">Section 1</div>
+  <div class="section" style="background-color: #444;">Section 2</div>
+  <div class="section" style="background-color: #555;">Section 3</div>
 
   <script>
-    let cursorX = 0, cursorY = 0;
+    let cursorX = 0;
+    let cursorY = 0;
 
-    // Create stars and animate their movement
+    // Create stars that move with the cursor
     function createStars() {
       const starfield = document.getElementById('starfield');
       for (let i = 0; i < 200; i++) {
@@ -272,19 +136,24 @@
       }
     }
 
-    // Move stars around the cursor
+    // Animate the custom cursor to follow the mouse
     document.addEventListener('mousemove', (e) => {
       cursorX = e.clientX;
       cursorY = e.clientY;
-      const stars = document.querySelectorAll('.star');
-      stars.forEach(star => {
-        const offsetX = (Math.random() - 0.5) * 30;
-        const offsetY = (Math.random() - 0.5) * 30;
-        star.style.transform = `translate(${cursorX + offsetX}px, ${cursorY + offsetY}px)`;
-      });
       document.querySelector('.cursor').style.transform = `translate(${cursorX - 15}px, ${cursorY - 15}px)`;
+
+      // Move stars with the cursor
+      document.querySelectorAll('.star').forEach(star => {
+        const distanceX = cursorX - parseFloat(star.style.left);
+        const distanceY = cursorY - parseFloat(star.style.top);
+        const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+        const movement = 0.05; // Star movement speed
+        const angle = Math.atan2(distanceY, distanceX);
+        star.style.transform = `translate(${Math.cos(angle) * distance * movement}px, ${Math.sin(angle) * distance * movement}px)`;
+      });
     });
 
+    // Trigger on scroll
     window.addEventListener('scroll', function () {
       document.querySelectorAll('.section').forEach(section => {
         if (window.scrollY + window.innerHeight > section.offsetTop + 100) {
