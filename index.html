@@ -12,10 +12,12 @@
       --text-color: #ffffff;
       --transition-speed: 0.3s;
     }
-    .dark-mode {
-      --primary-color: #4299e1;
-      --secondary-color: #2d3748;
-    }
+    /* When in night mode (dark-mode), we'll show stars; otherwise, day mode shows clouds */
+    body.dark-mode #starfield { display: block; }
+    body.dark-mode #cloudfield { display: none; }
+    body:not(.dark-mode) #starfield { display: none; }
+    body:not(.dark-mode) #cloudfield { display: block; }
+    
     * {
       margin: 0;
       padding: 0;
@@ -25,16 +27,20 @@
     html {
       scroll-behavior: smooth;
     }
+    /* Allow vertical scroll but hide horizontal overflow */
     body {
       background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
       color: var(--text-color);
       font-family: 'Inter', sans-serif;
       line-height: 1.6;
       min-height: 100vh;
-      overflow: hidden;
+      overflow-x: hidden;
+      overflow-y: auto;
       position: relative;
+      transition: background 0.5s ease;
     }
-    /* ---------- Ambient Background ---------- */
+    /* ---------- Ambient Background Containers ---------- */
+    /* Night: Starfield container */
     #starfield {
       position: fixed;
       top: 0;
@@ -45,22 +51,42 @@
       overflow: hidden;
       z-index: -5;
     }
-    /* ---------- Stars & Planets ---------- */
-    .star {
+    /* Day: Cloud container */
+    #cloudfield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, #87ceeb, #fff);
+      overflow: hidden;
+      z-index: -5;
+    }
+    /* ---------- Stars & Clouds ---------- */
+    .star, .cloud {
       position: absolute;
+    }
+    .star {
       width: 2px;
       height: 2px;
       background: white;
       border-radius: 50%;
       opacity: 0.8;
     }
+    .cloud {
+      width: 80px;
+      height: 50px;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      filter: blur(2px);
+    }
+    /* ---------- Planets ---------- */
     .planet {
       position: absolute;
       border-radius: 50%;
       opacity: 0.6;
       filter: blur(1px);
     }
-    /* Example planet styles */
     .planet-1 {
       width: 80px;
       height: 80px;
@@ -96,7 +122,6 @@
       filter: drop-shadow(0 0 15px yellow);
       transition: transform 0.1s ease-out;
     }
-    /* Create a flashlight-beam effect with a pseudo-element */
     .cursor::after {
       content: "";
       position: absolute;
@@ -290,13 +315,15 @@
 <body>
   <!-- Ambient Background Elements -->
   <div id="starfield"></div>
+  <div id="cloudfield"></div>
+  
   <!-- Planets -->
   <div class="planet planet-1"></div>
   <div class="planet planet-2"></div>
-
+  
   <!-- Custom Sun (Cursor) -->
   <div class="cursor"></div>
-
+  
   <nav>
     <div class="nav-container">
       <div class="logo interactive-element">Portfolio</div>
@@ -307,7 +334,7 @@
       </div>
     </div>
   </nav>
-
+  
   <section id="about" class="section">
     <div class="container">
       <div class="profile-img interactive-element"></div>
@@ -320,7 +347,7 @@
       </div>
     </div>
   </section>
-
+  
   <section id="projects" class="section">
     <div class="container">
       <h2 class="interactive-element">Projects</h2>
@@ -340,7 +367,7 @@
       </div>
     </div>
   </section>
-
+  
   <section id="contact" class="section">
     <div class="container">
       <h2 class="interactive-element">Contact Me</h2>
@@ -363,9 +390,9 @@
       </div>
     </div>
   </section>
-
-  <button class="theme-toggle interactive-element">🌓</button>
-
+  
+  <button class="theme-toggle interactive-element">Toggle Day/Night</button>
+  
   <script>
     // Global variables for cursor
     let cursorX = 0, cursorY = 0;
@@ -377,56 +404,99 @@
       cursor.style.top = cursorY + 'px';
     });
     
-    // Starfield generation and animation with repulsion effect
+    /* ---------- Generate Stars and Clouds ---------- */
     const starfield = document.getElementById('starfield');
+    const cloudfield = document.getElementById('cloudfield');
+    
     const numStars = 150;
     const stars = [];
-    const repulsionDistance = 80; // distance at which stars are repelled
-    // Create stars with random positions and velocities
+    const starRepelDist = 80;
+    const starRepelForce = 0.5; // Reduced force for slight movement
+    
     for (let i = 0; i < numStars; i++) {
-      const star = document.createElement('div');
-      star.classList.add('star');
+      const starEl = document.createElement('div');
+      starEl.classList.add('star');
       const starObj = {
-        el: star,
+        el: starEl,
         x: Math.random() * window.innerWidth,
         y: Math.random() * window.innerHeight,
-        vx: (Math.random() - 0.5) * 0.3, // small random velocity
+        vx: (Math.random() - 0.5) * 0.3,
         vy: (Math.random() - 0.5) * 0.3
       };
-      star.style.left = starObj.x + 'px';
-      star.style.top = starObj.y + 'px';
+      starEl.style.left = starObj.x + 'px';
+      starEl.style.top = starObj.y + 'px';
       stars.push(starObj);
-      starfield.appendChild(star);
+      starfield.appendChild(starEl);
     }
     
-    // Animation loop for stars
-    function updateStars() {
-      for (let star of stars) {
-        // Calculate distance from star to cursor
-        const dx = star.x - cursorX;
-        const dy = star.y - cursorY;
-        const distance = Math.sqrt(dx*dx + dy*dy);
-        if (distance < repulsionDistance) {
-          // Calculate repulsion vector (normalize and multiply by a factor)
-          const factor = (repulsionDistance - distance) / repulsionDistance;
-          const repelForce = 1.5; // adjust force
-          star.vx += (dx / distance) * factor * repelForce;
-          star.vy += (dy / distance) * factor * repelForce;
-        }
-        // Update star position
-        star.x += star.vx;
-        star.y += star.vy;
-        // Wrap around edges
-        if (star.x < 0) star.x = window.innerWidth;
-        if (star.x > window.innerWidth) star.x = 0;
-        if (star.y < 0) star.y = window.innerHeight;
-        if (star.y > window.innerHeight) star.y = 0;
-        star.el.style.left = star.x + 'px';
-        star.el.style.top = star.y + 'px';
-      }
-      requestAnimationFrame(updateStars);
+    const numClouds = 50;
+    const clouds = [];
+    const cloudRepelDist = 100;
+    const cloudRepelForce = 0.2;
+    
+    for (let i = 0; i < numClouds; i++) {
+      const cloudEl = document.createElement('div');
+      cloudEl.classList.add('cloud');
+      const cloudObj = {
+        el: cloudEl,
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: (Math.random() - 0.5) * 0.2
+      };
+      cloudEl.style.left = cloudObj.x + 'px';
+      cloudEl.style.top = cloudObj.y + 'px';
+      clouds.push(cloudObj);
+      cloudfield.appendChild(cloudEl);
     }
-    updateStars();
+    
+    // Animation loop for stars and clouds
+    function updateAmbient() {
+      // Update stars only if in night mode
+      if(document.body.classList.contains("dark-mode")){
+        for (let star of stars) {
+          const dx = star.x - cursorX;
+          const dy = star.y - cursorY;
+          const distance = Math.sqrt(dx*dx + dy*dy);
+          if (distance < starRepelDist) {
+            const factor = (starRepelDist - distance) / starRepelDist;
+            star.vx += (dx / distance) * factor * starRepelForce;
+            star.vy += (dy / distance) * factor * starRepelForce;
+          }
+          star.x += star.vx;
+          star.y += star.vy;
+          if (star.x < 0) star.x = window.innerWidth;
+          if (star.x > window.innerWidth) star.x = 0;
+          if (star.y < 0) star.y = window.innerHeight;
+          if (star.y > window.innerHeight) star.y = 0;
+          star.el.style.left = star.x + 'px';
+          star.el.style.top = star.y + 'px';
+        }
+      }
+      // Update clouds in day mode
+      else {
+        for (let cloud of clouds) {
+          const dx = cloud.x - cursorX;
+          const dy = cloud.y - cursorY;
+          const distance = Math.sqrt(dx*dx + dy*dy);
+          if (distance < cloudRepelDist) {
+            const factor = (cloudRepelDist - distance) / cloudRepelDist;
+            cloud.vx += (dx / distance) * factor * cloudRepelForce;
+            cloud.vy += (dy / distance) * factor * cloudRepelForce;
+          }
+          cloud.x += cloud.vx;
+          cloud.y += cloud.vy;
+          if (cloud.x < -100) cloud.x = window.innerWidth;
+          if (cloud.x > window.innerWidth) cloud.x = -100;
+          if (cloud.y < -100) cloud.y = window.innerHeight;
+          if (cloud.y > window.innerHeight) cloud.y = -100;
+          cloud.el.style.left = cloud.x + 'px';
+          cloud.el.style.top = cloud.y + 'px';
+        }
+      }
+      requestAnimationFrame(updateAmbient);
+    }
+    updateAmbient();
     
     // Intersection Observer for scroll animations
     const sections = document.querySelectorAll('.section');
@@ -446,7 +516,7 @@
       // Add your form submission logic here
     });
     
-    // Theme Toggle
+    // Theme Toggle (Day/Night)
     const themeToggle = document.querySelector('.theme-toggle');
     themeToggle.addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
@@ -463,9 +533,9 @@
       });
     });
     
-    // Adjust starfield on window resize
+    // Update ambient elements on window resize if needed
     window.addEventListener('resize', () => {
-      // Optionally update star positions if needed
+      // Optionally recalc positions
     });
   </script>
 </body>
